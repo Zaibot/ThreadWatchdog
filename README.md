@@ -35,3 +35,12 @@ void Application_BeginRequest()
     Watchdog.Instance.MonitorCurrentThread();
 }
 ```
+
+## Example Output
+```
+2015-03-30 22:40:59 +02:00
+Zaibot.ThreadWatchdog.DemoConsole [1] @ 99.97 % CPU usage
+
+Thread exceeded threshold CPU usage.
+   at Zaibot.ThreadWatchdog.DemoConsole.Program.Main(String[] args) in D:\...\Zaibot.ThreadWatchdog.DemoConsole\Program.cs:line 36
+```
