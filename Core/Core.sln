@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaibot.ThreadWatchdog.Core", "Source\Zaibot.ThreadWatchdog.Core\Zaibot.ThreadWatchdog.Core.csproj", "{9FAE44E7-7050-4FE9-942B-C4D61A338DCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaibot.ThreadWatchdog.DemoConsole", "Source\Zaibot.ThreadWatchdog.DemoConsole\Zaibot.ThreadWatchdog.DemoConsole.csproj", "{F3C1841F-F4D7-4005-B477-791F03AB0ED3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9FAE44E7-7050-4FE9-942B-C4D61A338DCD} = {9FAE44E7-7050-4FE9-942B-C4D61A338DCD}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Includes", "Includes", "{0B6ED541-05EE-4B35-A9B8-B5796D2137F1}"
+	ProjectSection(SolutionItems) = preProject
+		..\Includes\ThreadWatchdog_Product.cs = ..\Includes\ThreadWatchdog_Product.cs
+		..\Includes\ThreadWatchdog_Version.cs = ..\Includes\ThreadWatchdog_Version.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FAE44E7-7050-4FE9-942B-C4D61A338DCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FAE44E7-7050-4FE9-942B-C4D61A338DCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FAE44E7-7050-4FE9-942B-C4D61A338DCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FAE44E7-7050-4FE9-942B-C4D61A338DCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C1841F-F4D7-4005-B477-791F03AB0ED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3C1841F-F4D7-4005-B477-791F03AB0ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3C1841F-F4D7-4005-B477-791F03AB0ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C1841F-F4D7-4005-B477-791F03AB0ED3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 0ed2a26a-d223-4794-85c1-ea8761073cb6
+	EndGlobalSection
+EndGlobal
