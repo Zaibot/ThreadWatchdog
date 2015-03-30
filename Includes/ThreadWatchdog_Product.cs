@@ -6,5 +6,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("ThreadWatchdog")]
 [assembly: AssemblyCopyright("Copyright © Zaibot Programs 2015")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("en-US")]
+[assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
