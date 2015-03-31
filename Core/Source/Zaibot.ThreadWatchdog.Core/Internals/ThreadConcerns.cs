@@ -24,24 +24,24 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Zaibot.ThreadWatchdog.Core.Native;
 
 namespace Zaibot.ThreadWatchdog.Core.Internals
 {
     internal static class ThreadConcerns
     {
-        private static readonly IntPtr ProcessHandle = Process.GetCurrentProcess().Handle;
-
         internal static IntPtr GetCurrentThreadHandle()
         {
-            var pseudoThread = Kernel32Api.GetCurrentThread();
-
             // Returns a pseudo handle, duplicate to get the actual handle value.
             IntPtr actualThread;
 
-            var duplicateHandle = Kernel32Api.DuplicateHandle(ProcessHandle, pseudoThread, ProcessHandle, out actualThread, 0, true, Kernel32Api.DUPLICATE_SAME_ACCESS);
+            var processHandle = Kernel32Api.GetCurrentProcess();
+            var threadHandle = Kernel32Api.GetCurrentThread();
+
+            var duplicateHandle = Kernel32Api.DuplicateHandle(processHandle, threadHandle, processHandle, out actualThread, 0, false, Kernel32Api.DUPLICATE_SAME_ACCESS);
             if (duplicateHandle == false)
-                throw new WatchdogException("Unable to duplicate the native thread handle.");
+                throw new WatchdogException("Unable to duplicate the native thread handle. " + Marshal.GetLastWin32Error() + " :: " + threadHandle.ToInt64().ToString("X16") + " :: " + processHandle.ToInt64().ToString("X16"));
 
             return actualThread;
         }

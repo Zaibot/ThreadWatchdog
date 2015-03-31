@@ -34,11 +34,18 @@ namespace Zaibot.ThreadWatchdog.Core.Native
         [DllImport("kernel32.dll", EntryPoint = "GetCurrentThread", ExactSpelling = true)]
         internal static extern IntPtr GetCurrentThread();
 
+        [DllImport("kernel32.dll", EntryPoint = "GetCurrentProcess", ExactSpelling = true)]
+        internal static extern IntPtr GetCurrentProcess();
+
         [DllImport("kernel32.dll", EntryPoint = "GetThreadTimes", ExactSpelling = true, SetLastError = true)]
         internal static extern long GetThreadTimes(IntPtr threadHandle, out long createionTime, out long exitTime, out long kernelTime, out long userTime);
 
         [DllImport("kernel32.dll", EntryPoint = "DuplicateHandle", ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DuplicateHandle(IntPtr hSourceProcessHandle, IntPtr hSourceHandle, IntPtr hTargetProcessHandle, out IntPtr lpTargetHandle, uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
+        
+        [DllImport("kernel32.dll", EntryPoint = "CloseHandle", ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CloseHandle(IntPtr handle);
     }
 }

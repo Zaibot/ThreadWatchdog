@@ -264,6 +264,8 @@ namespace Zaibot.ThreadWatchdog.Core
         {
             lock (this)
             {
+                tracker.ExecutionTimer.Dispose();
+
                 var threadDebugs = new List<Tracker>(this._trackers);
                 threadDebugs.Remove(tracker);
                 this._trackers = threadDebugs;

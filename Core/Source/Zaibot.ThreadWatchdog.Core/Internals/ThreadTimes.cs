@@ -30,7 +30,7 @@ namespace Zaibot.ThreadWatchdog.Core.Internals
     /// <summary>
     /// Calculates the CPU time used by the native thread that called the constructor.
     /// </summary>
-    internal sealed class ThreadTimes
+    internal sealed class ThreadTimes : IDisposable
     {
         private readonly IntPtr _threadHandle;
         private long _startTime;
@@ -62,6 +62,11 @@ namespace Zaibot.ThreadWatchdog.Core.Internals
             var totalTime = kernelTime + userTime;
 
             return totalTime;
+        }
+
+        public void Dispose()
+        {
+            Kernel32Api.CloseHandle(_threadHandle);
         }
     }
 }
