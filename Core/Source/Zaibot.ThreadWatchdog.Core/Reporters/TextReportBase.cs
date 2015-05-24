@@ -25,8 +25,10 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using ThreadState = System.Threading.ThreadState;
 
 // Thread.Suspend, Thread.Resume and new StackTrace(Thread...) have been marked as obsolete.
 #pragma warning disable 618
@@ -45,62 +47,78 @@ namespace Zaibot.ThreadWatchdog.Core.Reporters
         void IWatchdogSubscriber.OnReport(WatchdogReport report)
         {
             var thread = report.Thread;
-            if (thread != Thread.CurrentThread)
+            var result = GetThreadStackTrace(thread);
+            if (result.Error != null)
             {
-                StackTrace trace = null;
-                Exception error = null;
+                var cpuUsage = report.Usage;
 
-                Thread.BeginThreadAffinity();
-                Thread.BeginCriticalRegion();
+                var errorMessage = new StringBuilder(1024);
+                errorMessage.AppendLine(DateTime.Now.ToString(this.DateTimeFormat, CultureInfo.InvariantCulture));
+                errorMessage.AppendLine(string.Format("{0} [{1}] @ {2:P} CPU usage", Process.GetCurrentProcess().ProcessName, report.Thread.ManagedThreadId, cpuUsage));
+                errorMessage.AppendLine("Unable to read the stack trace due to an error: " + result.Error.Message);
+                errorMessage.AppendLine();
+                errorMessage.AppendLine(result.Error.StackTrace);
+
+                var text = errorMessage.ToString();
+                ThreadPool.QueueUserWorkItem(x => this.OnReportText(text));
+            }
+            else if (result.Trace != null)
+            {
+                var cpuUsage = report.Usage;
+
+                var reportText = new StringBuilder(1024);
+                reportText.AppendLine(DateTime.Now.ToString(this.DateTimeFormat));
+                reportText.AppendLine(string.Format("{0} [{1}] @ {2:P} CPU usage", Process.GetCurrentProcess().ProcessName, report.Thread.ManagedThreadId, cpuUsage));
+                reportText.AppendLine();
+                reportText.AppendLine("Thread exceeded threshold CPU usage.");
+                reportText.AppendLine(result.Trace.ToString());
+
+                var text = reportText.ToString();
+                ThreadPool.QueueUserWorkItem(x => this.OnReportText(text));
+            }
+        }
+
+        struct StackTraceReport
+        {
+            public StackTrace Trace;
+            public Exception Error;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.Synchronized | MethodImplOptions.NoOptimization)]
+        private static StackTraceReport GetThreadStackTrace(Thread thread)
+        {
+            var result = new StackTraceReport();
+
+            Thread.BeginThreadAffinity();
+            Thread.BeginCriticalRegion();
+
+            RuntimeHelpers.PrepareConstrainedRegions();
+            try
+            {
+                if (thread == Thread.CurrentThread)
+                    return result;
+
+                thread.Suspend();
                 try
                 {
-                    thread.Suspend();
-                    try
-                    {
-                        trace = new StackTrace(thread, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        error = ex;
-                    }
-                    finally
-                    {
-                        thread.Resume();
-                    }
+                    result.Trace = new StackTrace(thread, true);
+                }
+                catch (Exception ex)
+                {
+                    result.Error = ex;
                 }
                 finally
                 {
-                    Thread.EndCriticalRegion();
-                    Thread.EndThreadAffinity();
-                }
-
-                if (error != null)
-                {
-                    var cpuUsage = report.Usage;
-
-                    var errorMessage = new StringBuilder(1024);
-                    errorMessage.AppendLine(DateTime.Now.ToString(this.DateTimeFormat, CultureInfo.InvariantCulture));
-                    errorMessage.AppendLine(string.Format("{0} [{1}] @ {2:P} CPU usage", Process.GetCurrentProcess().ProcessName, report.Thread.ManagedThreadId, cpuUsage));
-                    errorMessage.AppendLine("Unable to read the stack trace due to an error: " + error.Message);
-                    errorMessage.AppendLine();
-                    errorMessage.AppendLine(error.StackTrace);
-
-                    this.OnReportText(errorMessage.ToString());
-                }
-                else
-                {
-                    var cpuUsage = report.Usage;
-
-                    var reportText = new StringBuilder(1024);
-                    reportText.AppendLine(DateTime.Now.ToString(this.DateTimeFormat));
-                    reportText.AppendLine(string.Format("{0} [{1}] @ {2:P} CPU usage", Process.GetCurrentProcess().ProcessName, report.Thread.ManagedThreadId, cpuUsage));
-                    reportText.AppendLine();
-                    reportText.AppendLine("Thread exceeded threshold CPU usage.");
-                    reportText.AppendLine(trace.ToString());
-
-                    this.OnReportText(reportText.ToString());
+                    thread.Resume();
                 }
             }
+            finally
+            {
+                Thread.EndCriticalRegion();
+                Thread.EndThreadAffinity();
+            }
+
+            return result;
         }
 
         /// <summary>
